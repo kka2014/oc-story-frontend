@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>OC叙事工坊 - 角色故事管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'PingFang SC', Roboto, sans-serif;
+        }
+
+        body {
+            background: #f0f4f8;
+            padding: 24px 20px;
+            color: #1e2f3e;
+        }
+
+        .app-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* 头部样式 */
+        .header {
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2c5f7a, #1e3e54);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sub {
+            color: #4a6272;
+            margin-top: 6px;
+            font-size: 0.9rem;
+            border-left: 3px solid #3e8e9e;
+            padding-left: 12px;
+        }
+
+        /* 标签页 */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            background: white;
+            padding: 8px;
+            border-radius: 60px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #5a7a8a;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #2c7f8c;
+            color: white;
+        }
+
+        /* 卡片 */
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 28px;
+            border: 1px solid #e2edf2;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .card h3 {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: #1f4e62;
+        }
+
+        /* 表单 */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #2c5a6e;
+        }
+        input, textarea, select {
+            border: 1px solid #dce5ea;
+            border-radius: 14px;
+            padding: 10px 14px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+
+        /* 按钮 */
+        button {
+            background: #2c7f8c;
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover {
+            background: #1f616c;
+            transform: translateY(-1px);
+        }
+        .btn-outline {
+            background: white;
+            border: 1px solid #2c7f8c;
+            color: #2c7f8c;
+        }
+        .btn-outline:hover {
+            background: #eef7f9;
+            transform: none;
+        }
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 0.7rem;
+        }
+        .btn-danger {
+            background: #cf6f6f;
+        }
+        .btn-danger:hover {
+            background: #b15555;
+        }
+        .btn-secondary {
+            background: #4a6272;
+        }
+        .btn-secondary:hover {
+            background: #3a4f5e;
+        }
+        .action-bar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        /* 搜索栏 */
+        .search-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .search-bar input {
+            flex: 1;
+            min-width: 200px;
+        }
+        .count-badge {
+            background: #eef3f6;
+            padding: 6px 12px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+        }
+
+        /* OC 卡片网格 */
+        .oc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        .oc-card {
+            background: #fefefe;
+            border-radius: 20px;
+            border: 1px solid #e8eef2;
+            padding: 18px;
+            transition: 0.2s;
+        }
+        .oc-card:hover {
+            border-color: #c5dce5;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+        .oc-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1f4e62;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .oc-badge {
+            background: #e5f0f3;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: normal;
+        }
+        .oc-info-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 12px 0;
+        }
+        .oc-info-row span {
+            background: #f4f8fa;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        .oc-elements {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 10px 0;
+        }
+        .element-tag {
+            background: #eef2f5;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+        .oc-desc {
+            margin: 12px 0;
+            line-height: 1.5;
+            color: #3a5e70;
+            font-size: 0.85rem;
+        }
+        .oc-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px dashed #e0eef3;
+        }
+
+        /* 时间线 */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            bottom: 12px;
+            width: 3px;
+            background: linear-gradient(to bottom, #bdd9e2, #6c9eae);
+            border-radius: 3px;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+            background: #fefefd;
+            border-radius: 18px;
+            padding: 16px 20px;
+            border: 1px solid #e0edf0;
+            transition: 0.2s;
+        }
+        .timeline-item:hover {
+            border-color: #c5dce5;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+        }
+        .timeline-dot {
+            position: absolute;
+            left: -30px;
+            top: 20px;
+            width: 14px;
+            height: 14px;
+            background: #3e8e9e;
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px #c1dee8;
+        }
+        .timeline-date {
+            font-weight: 700;
+            color: #2c5f7a;
+            font-size: 0.8rem;
+            background: #eaf4f8;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 40px;
+            margin-bottom: 10px;
+        }
+        .timeline-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1f4e62;
+            margin-bottom: 6px;
+        }
+        .timeline-story {
+            color: #2e4758;
+            line-height: 1.45;
+        }
+        .timeline-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            font-size: 0.75rem;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .tag {
+            background: #e5f0f3;
+            padding: 4px 10px;
+            border-radius: 30px;
+        }
+
+        /* 其他 */
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .backup-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #8ba8b5;
+            background: #fafeff;
+            border-radius: 32px;
+        }
+        .status-badge {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            color: white;
+            z-index: 100;
+            background: #cf6f6f;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 40px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 1001;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            pointer-events: none;
+            animation: slideDown 0.3s ease, fadeOut 0.5s ease 2s forwards;
+        }
+        .notification.success { background: #2c7f8c; }
+        .notification.error { background: #cf6f6f; }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; visibility: hidden; }
+        }
+        @media (max-width: 700px) {
+            .oc-grid { grid-template-columns: 1fr; }
+            .tabs { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="app-container">
+        <!-- 通知 -->
+        <div v-if="notificationShow" class="notification success" style="display: block;">
+            {{ notificationMessage }}
+        </div>
+
+        <!-- 头部 -->
+        <div class="header">
+            <div>
+                <h1>📖 OC叙事工坊</h1>
+                <div class="sub">角色档案 · 故事管理</div>
+            </div>
+            <div class="tabs">
+                <button class="tab-btn" :class="{ active: currentTab === 'oc' }" @click="currentTab = 'oc'">OC档案库</button>
+                <button class="tab-btn" :class="{ active: currentTab === 'story' }" @click="currentTab = 'story'">故事时间线</button>
+            </div>
+        </div>
+
+        <!-- 操作栏 -->
+        <div class="card">
+            <div class="flex-between">
+                <div class="backup-buttons">
+                    <button class="btn-secondary" @click="exportData">导出备份</button>
+                    <label class="btn-secondary" style="cursor:pointer;">
+                        导入备份
+                        <input type="file" @change="importData" accept=".json" style="display:none;">
+                    </label>
+                    <button class="btn-danger" @click="clearAllData">清空数据</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- OC 管理 -->
+        <div v-show="currentTab === 'oc'">
+            <div class="card">
+                <h3>{{ editingOc ? '编辑角色' : '添加新OC' }}</h3>
+                <div class="form-grid">
+                    <div class="form-group"><label>姓名</label><input v-model="formOc.name" placeholder="塞莉克丝"></div>
+                    <div class="form-group"><label>英文名</label><input v-model="formOc.englishName" placeholder="Salix"></div>
+                    <div class="form-group"><label>性别</label><select v-model="formOc.gender"><option>女</option><option>男</option></select></div>
+                    <div class="form-group"><label>生日</label><input v-model="formOc.birthday" placeholder="4.12"></div>
+                    <div class="form-group"><label>星座</label><input v-model="formOc.zodiac" placeholder="白羊座"></div>
+                    <div class="form-group"><label>年龄</label><input v-model="formOc.age" placeholder="18"></div>
+                    <div class="form-group"><label>身高</label><input v-model="formOc.height" placeholder="170cm"></div>
+                    <div class="form-group"><label>体重</label><input v-model="formOc.weight" placeholder="50kg"></div>
+                    <div class="form-group"><label>MBTI</label><input v-model="formOc.mbti" placeholder="ENTJ-A"></div>
+                    <div class="form-group"><label>外貌特征</label><textarea v-model="formOc.appearance" rows="2"></textarea></div>
+                    <div class="form-group"><label>元素</label><input v-model="formOc.elements" placeholder="白百合、格纹"></div>
+                    <div class="form-group"><label>性格</label><textarea v-model="formOc.personality" rows="2"></textarea></div>
+                    <div class="form-group"><label>背景</label><textarea v-model="formOc.background" rows="2"></textarea></div>
+                </div>
+                <div class="action-bar">
+                    <button class="btn-outline" @click="resetOcForm">清空</button>
+                    <button v-if="!editingOc" @click="addOc">保存角色</button>
+                    <button v-if="editingOc" @click="updateOc">更新角色</button>
+                    <button v-if="editingOc" @click="cancelEditOc" class="btn-outline">取消</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="search-bar">
+                    <input v-model="searchOc" placeholder="搜索OC...">
+                    <span class="count-badge">共 {{ ocListFiltered.length }} 个角色</span>
+                </div>
+                <div class="oc-grid">
+                    <div v-for="oc in ocListFiltered" :key="oc.id" class="oc-card">
+                        <div class="oc-name">{{ oc.name }}<span class="oc-badge">{{ oc.gender }} · {{ oc.age }}岁</span></div>
+                        <div class="oc-info-row"><span>🎂 {{ oc.birthday }}</span><span>{{ oc.height }}</span></div>
+                        <div class="oc-elements"><span v-for="e in oc.elements.split(',').filter(x=>x)" class="element-tag">{{ e.trim() }}</span></div>
+                        <div class="oc-desc"><strong>外貌</strong><br>{{ oc.appearance }}</div>
+                        <div class="oc-actions">
+                            <button class="btn-sm" @click="startEditOc(oc)">编辑</button>
+                            <button class="btn-sm btn-outline" @click="deleteOc(oc.id)">删除</button>
+                        </div>
+                    </div>
+                    <div v-if="ocListFiltered.length === 0" class="empty-message">暂无OC</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 故事管理 -->
+        <div v-show="currentTab === 'story'">
+            <div class="card">
+                <h3>{{ editingStory ? '编辑故事' : '添加新故事' }}</h3>
+                <div class="form-grid">
+                    <div class="form-group"><label>标题</label><input v-model="formStory.title" placeholder="暮星降临"></div>
+                    <div class="form-group"><label>时间</label><input v-model="formStory.eventDate" placeholder="纪元1023年·春"></div>
+                    <div class="form-group"><label>关联OC</label><input v-model="formStory.tags" placeholder="塞莉克丝"></div>
+                    <div class="form-group"><label>内容</label><textarea v-model="formStory.content" rows="3"></textarea></div>
+                </div>
+                <div class="action-bar">
+                    <button class="btn-outline" @click="resetStoryForm">清空</button>
+                    <button v-if="!editingStory" @click="addStory">保存故事</button>
+                    <button v-if="editingStory" @click="updateStory">更新故事</button>
+                    <button v-if="editingStory" @click="cancelEditStory" class="btn-outline">取消</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="search-bar">
+                    <input v-model="searchStory" placeholder="搜索故事...">
+                    <span class="count-badge">共 {{ storyListFiltered.length }} 个故事</span>
+                </div>
+                <div class="timeline">
+                    <div v-for="story in storyListFiltered" :key="story.id" class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">{{ story.eventDate }}</div>
+                        <div class="timeline-title">{{ story.title }}</div>
+                        <div class="timeline-story">{{ story.content }}</div>
+                        <div class="timeline-meta">
+                            <span class="tag">{{ story.tags }}</span>
+                            <div>
+                                <button class="btn-sm" @click="startEditStory(story)">编辑</button>
+                                <button class="btn-sm btn-outline" @click="deleteStory(story.id)">删除</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="storyListFiltered.length === 0" class="empty-message">暂无故事</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-badge">🌐 线上版 · 数据在浏览器中</div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script>
+  const STORAGE_OC = 'oc_characters';
+  const STORAGE_STORY = 'oc_stories';
+  
+  const DEFAULT_OCS = [
+    { id: 1, name: '塞莉克丝', englishName: 'Salix', gender: '女', birthday: '4.12', zodiac: '白羊座', age: '18', height: '170cm', weight: '50kg', mbti: 'ENTJ-A', hairColor: '天青色', eyeColor: '柳色', appearance: '左脸脸颊有一颗痣', elements: '白百合、格纹', personality: '有很强的领导力', background: '16岁接任父母职位' }
+  ];
+  const DEFAULT_STORIES = [
+    { id: 1, title: '暮星降临', eventDate: '纪元1023年·春', tags: '塞莉克丝', content: '在流星雨的夜晚获得造物之力。' }
+  ];
+
+  // 加载数据
+  function loadData() {
+    const ocData = localStorage.getItem(STORAGE_OC);
+    const storyData = localStorage.getItem(STORAGE_STORY);
+    return {
+      ocs: ocData ? JSON.parse(ocData) : JSON.parse(JSON.stringify(DEFAULT_OCS)),
+      stories: storyData ? JSON.parse(storyData) : JSON.parse(JSON.stringify(DEFAULT_STORIES))
+    };
+  }
+
+  function saveData(ocs, stories) {
+    localStorage.setItem(STORAGE_OC, JSON.stringify(ocs));
+    localStorage.setItem(STORAGE_STORY, JSON.stringify(stories));
+  }
+
+  const app = createApp({
+    data() {
+      const { ocs, stories } = loadData();
+      return {
+        currentTab: 'oc',
+        notificationShow: false,
+        notificationMessage: '',
+        ocs: ocs,
+        stories: stories,
+        searchOc: '',
+        searchStory: '',
+        editingOc: false,
+        editingStory: false,
+        editOcId: null,
+        editStoryId: null,
+        formOc: { name: '', englishName: '', gender: '女', birthday: '', zodiac: '', age: '', height: '', weight: '', mbti: '', hairColor: '', eyeColor: '', appearance: '', elements: '', personality: '', background: '' },
+        formStory: { title: '', eventDate: '', tags: '', content: '' }
+      };
+    },
+    computed: {
+      ocListFiltered() {
+        if (!this.searchOc) return this.ocs;
+        return this.ocs.filter(oc => oc.name.toLowerCase().includes(this.searchOc.toLowerCase()) || (oc.elements && oc.elements.toLowerCase().includes(this.searchOc.toLowerCase())));
+      },
+      storyListFiltered() {
+        if (!this.searchStory) return this.stories;
+        return this.stories.filter(story => story.title.toLowerCase().includes(this.searchStory.toLowerCase()));
+      }
+    },
+    methods: {
+      showMessage(msg) {
+        this.notificationMessage = msg;
+        this.notificationShow = true;
+        setTimeout(() => { this.notificationShow = false; }, 2000);
+      },
+      syncToLocal() {
+        saveData(this.ocs, this.stories);
+      },
+      exportData() {
+        const data = { ocs: this.ocs, stories: this.stories, exportTime: new Date().toLocaleString() };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `oc-backup-${new Date().toISOString().slice(0, 19)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        this.showMessage('导出成功');
+      },
+      importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const data = JSON.parse(e.target.result);
+            if (data.ocs) this.ocs = data.ocs;
+            if (data.stories) this.stories = data.stories;
+            this.syncToLocal();
+            this.showMessage('导入成功');
+          } catch (err) {
+            this.showMessage('文件格式错误');
+          }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+      },
+      clearAllData() {
+        if (confirm('⚠️ 清空后无法恢复，确定清空所有数据吗？')) {
+          this.ocs = [];
+          this.stories = [];
+          this.syncToLocal();
+          this.showMessage('已清空');
+        }
+      },
+      resetOcForm() {
+        this.formOc = { name: '', englishName: '', gender: '女', birthday: '', zodiac: '', age: '', height: '', weight: '', mbti: '', hairColor: '', eyeColor: '', appearance: '', elements: '', personality: '', background: '' };
+        this.editingOc = false;
+        this.editOcId = null;
+      },
+      addOc() {
+        if (!this.formOc.name) { this.showMessage('请填写姓名'); return; }
+        const newId = Date.now();
+        this.ocs.push({ ...this.formOc, id: newId });
+        this.syncToLocal();
+        this.resetOcForm();
+        this.showMessage('保存成功');
+      },
+      startEditOc(oc) {
+        this.editingOc = true;
+        this.editOcId = oc.id;
+        this.formOc = { ...oc };
+      },
+      updateOc() {
+        const index = this.ocs.findIndex(o => o.id === this.editOcId);
+        if (index !== -1) {
+          this.ocs[index] = { ...this.formOc, id: this.editOcId };
+          this.syncToLocal();
+          this.resetOcForm();
+          this.showMessage('更新成功');
+        }
+      },
+      deleteOc(id) {
+        if (confirm('确定删除吗？')) {
+          this.ocs = this.ocs.filter(o => o.id !== id);
+          this.syncToLocal();
+          this.showMessage('删除成功');
+        }
+      },
+      cancelEditOc() { this.resetOcForm(); },
+      
+      resetStoryForm() {
+        this.formStory = { title: '', eventDate: '', tags: '', content: '' };
+        this.editingStory = false;
+        this.editStoryId = null;
+      },
+      addStory() {
+        if (!this.formStory.title) { this.showMessage('请填写标题'); return; }
+        const newId = Date.now();
+        this.stories.push({ ...this.formStory, id: newId });
+        this.syncToLocal();
+        this.resetStoryForm();
+        this.showMessage('保存成功');
+      },
+      startEditStory(story) {
+        this.editingStory = true;
+        this.editStoryId = story.id;
+        this.formStory = { ...story };
+      },
+      updateStory() {
+        const index = this.stories.findIndex(s => s.id === this.editStoryId);
+        if (index !== -1) {
+          this.stories[index] = { ...this.formStory, id: this.editStoryId };
+          this.syncToLocal();
+          this.resetStoryForm();
+          this.showMessage('更新成功');
+        }
+      },
+      deleteStory(id) {
+        if (confirm('确定删除吗？')) {
+          this.stories = this.stories.filter(s => s.id !== id);
+          this.syncToLocal();
+          this.showMessage('删除成功');
+        }
+      },
+      cancelEditStory() { this.resetStoryForm(); }
+    }
+  });
+  app.mount('#app');
+</script>
+</body>
+</html>
